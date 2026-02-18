@@ -1,0 +1,20 @@
+--- PARACETAMOL ---
+Name: Paracetamol
+Used for: Fever and mild to moderate pain
+How it works: Reduces pain signals and body temperature
+Common side effects: Nausea, liver damage if overdosed
+Notes: Do not exceed prescribed dose
+
+--- CETIRIZINE ---
+Name: Cetirizine
+Used for: Allergy symptoms like sneezing and itching
+How it works: Blocks histamine
+Common side effects: Drowsiness, dry mouth
+Notes: Avoid alcohol
+
+--- AZITHROMYCIN ---
+Name: Azithromycin
+Used for: Bacterial infections
+How it works: Stops bacterial growth
+Common side effects: Stomach upset, diarrhea
+Notes: Complete full course

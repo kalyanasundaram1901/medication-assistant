@@ -1,0 +1,16 @@
+[
+    {
+        "id": "cf09ea07-ddeb-4929-800c-33ee69d5a4f9",
+        "name": "paracetamol",
+        "time": "16:00",
+        "days": [
+            "Sun",
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri",
+            "Sat"
+        ]
+    }
+]
