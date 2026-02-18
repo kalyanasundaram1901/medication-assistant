@@ -1,5 +1,0 @@
-Name: Metformin
-Used for: Type 2 diabetes
-How it works: Lowers blood sugar production
-Common side effects: Nausea, diarrhea
-Notes: Take with meals

@@ -1,5 +1,0 @@
-Name: Insulin
-Used for: Diabetes management
-How it works: Regulates blood sugar levels
-Common side effects: Low blood sugar
-Notes: Follow dosage strictly
