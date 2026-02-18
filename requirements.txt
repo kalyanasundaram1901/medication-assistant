@@ -10,7 +10,7 @@ requests
 google-generativeai
 pytesseract
 pillow
-plyer
 pandas
 openpyxl
+
 
