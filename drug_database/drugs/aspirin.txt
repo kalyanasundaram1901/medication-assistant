@@ -1,0 +1,5 @@
+Name: Aspirin
+Used for: Pain, fever, heart protection
+How it works: Prevents clot formation
+Common side effects: Stomach irritation
+Notes: Avoid on empty stomach
