@@ -5,11 +5,15 @@ flask-sqlalchemy
 flask-jwt-extended
 pywebpush
 python-dotenv
+psycopg2-binary
 requests
 google-generativeai
 pillow
+pytesseract
+plyer
 pandas
 openpyxl
+
 
 
 
