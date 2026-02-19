@@ -22,5 +22,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the backend files
 COPY . .
 
-# Use the direct path to gunicorn to avoid 'not found' errors
-CMD ["python3", "-m", "gunicorn", "--bind", "0.0.0.0:$PORT", "main:app"]
+# This version forces the shell to translate $PORT into a real number
+CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:$PORT main:app"]
