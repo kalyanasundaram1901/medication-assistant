@@ -9,6 +9,7 @@ requests
 google-generativeai
 pytesseract
 pillow
+gunicorn
 plyer
 pandas
 openpyxl
