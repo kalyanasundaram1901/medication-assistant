@@ -294,5 +294,10 @@ def upload():
 def get_vapid_public_key():
     return jsonify({"publicKey": os.getenv('VAPID_PUBLIC_KEY')})
 
+import os
+
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    # Render provides the port in an environment variable called 'PORT'
+    # We use 10000 as a backup default for Render
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port)
