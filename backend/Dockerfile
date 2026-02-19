@@ -1,21 +1,26 @@
 FROM python:3.11-slim
 
-# Switch to root user to ensure we have permission to install software
+# Switch to root to ensure full permissions for system installs
 USER root
 
-# Fix for Exit Code 100: Use a more reliable update command
-RUN apt-get update --fix-missing && apt-get install -y \
+# Fix for Exit Code 100: Standardize the sources and use --fix-missing
+RUN apt-get update --fix-missing && \
+    apt-get install -y --no-install-recommends \
     tesseract-ocr \
     libtesseract-dev \
-    libgl1-mesa-glx \
-    && rm -rf /var/lib/apt/lists/*
+    libgl1 \
+    libglib2.0-0 \
+    && apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
+# Copy and install Python requirements
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy the rest of the backend files
 COPY . .
 
-# Final command using the correct Port
+# Use Gunicorn to bind to the Render-provided port
 CMD gunicorn --bind 0.0.0.0:$PORT main:app
