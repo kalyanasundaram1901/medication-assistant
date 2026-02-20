@@ -1,0 +1,63 @@
+/* Period Selector Styles - Bright Medical Edition */
+.period-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: white !important;
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    cursor: pointer;
+    border: 1px solid #e2e8f0 !important;
+    transition: all 0.2s ease;
+    user-select: none;
+    margin-bottom: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.period-row:hover {
+    background: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+}
+
+.period-row.active {
+    background: #eff6ff !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+}
+
+.period-checkbox {
+    width: 20px;
+    height: 20px;
+    accent-color: #3b82f6;
+    cursor: pointer;
+}
+
+.period-label {
+    flex: 1;
+    font-weight: 600;
+    color: #64748b !important;
+    font-size: 0.95rem;
+}
+
+.period-row.active .period-label {
+    color: #1e40af !important;
+}
+
+.period-time-input {
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-family: inherit;
+    font-weight: 600;
+    color: #1e293b !important;
+    background: white !important;
+    width: auto;
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.period-time-input:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}

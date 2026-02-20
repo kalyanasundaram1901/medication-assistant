@@ -1,0 +1,41 @@
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: linear-gradient(135deg,
+      #f8fafc,
+      #e0f2fe,
+      #f0fdf4);
+  color: #1e293b;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 30% 30%, #3b82f6 0%, transparent 40%),
+    radial-gradient(circle at 70% 60%, #10b981 0%, transparent 40%);
+  opacity: 0.15;
+  animation: glowMove 20s infinite alternate;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes glowMove {
+  from {
+    transform: translate(0, 0);
+  }
+
+  to {
+    transform: translate(-30px, -30px);
+  }
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
