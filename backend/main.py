@@ -301,3 +301,17 @@ if __name__ == "__main__":
     # We use 10000 as a backup default for Render
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
+
+# --- ADD THIS TO THE VERY BOTTOM OF main.py ---
+with app.app_context():
+    # This ensures your database tables are created on Render
+    db.create_all() 
+    
+    # Check if your specific user exists and make them an admin
+    from models import User
+    # Replace 'YOUR_USERNAME' with the name you used to register
+    user = User.query.filter_by(username='YOUR_USERNAME').first()
+    if user:
+        user.role = 'admin'
+        db.session.commit()
+        print("Success: User promoted to Admin!")
