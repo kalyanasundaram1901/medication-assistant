@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 
 // For mobile apps, you should replace 'localhost' with your computer's local IP (e.g., 10.142.143.132)
-const API_BASE_URL = `http://${window.location.hostname}:5000`;
+const API_BASE_URL = `https://medication-assistant.onrender.com`;
 
 export const Login = ({ onToggle }) => {
     const [username, setUsername] = useState('');
