@@ -310,8 +310,9 @@ with app.app_context():
     # Check if your specific user exists and make them an admin
     from models import User
     # Replace 'YOUR_USERNAME' with the name you used to register
-    user = User.query.filter_by(username='YOUR_USERNAME').first()
+    user = User.query.filter_by(username='Sanjay').first()
     if user:
         user.role = 'admin'
         db.session.commit()
         print("Success: User promoted to Admin!")
+
