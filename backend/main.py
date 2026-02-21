@@ -58,7 +58,8 @@ def reminder_worker():
     with app.app_context():
         while True:
             try:
-                now = datetime.now()
+                # Render servers use UTC. Adjusting to IST (+5:30) for the user.
+                now = datetime.utcnow() + timedelta(hours=5, minutes=30)
                 current_time = now.strftime("%H:%M")
                 current_day = now.strftime("%a")
                 date_str = now.strftime("%Y-%m-%d")
