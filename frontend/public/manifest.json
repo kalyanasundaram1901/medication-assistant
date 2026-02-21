@@ -20,12 +20,12 @@
       "purpose": "any maskable"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
-  "orientation": "portrait-primary",
+  "orientation": "portrait",
   "theme_color": "#3b82f6",
   "background_color": "#ffffff",
-  "description": "Your AI-powered personal health assistant and medication tracker.",
+  "description": "AI Medication Tracker and Personal Health Companion",
   "screenshots": [],
   "shortcuts": [
     {
