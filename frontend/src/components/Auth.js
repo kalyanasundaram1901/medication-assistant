@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 // For mobile apps, you should replace 'localhost' with your computer's local IP (e.g., 10.142.143.132)
 const API_BASE_URL = `https://medication-assistant.onrender.com`;
 
-export const Login = ({ onToggle }) => {
+export const Login = ({ onToggle, deferredPrompt, onInstall }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const { login } = useAuth();
@@ -23,6 +23,29 @@ export const Login = ({ onToggle }) => {
 
     return (
         <div className="glass-card auth-card" style={{ padding: '32px' }}>
+            {deferredPrompt && (
+                <div className="install-banner" style={{
+                    background: 'var(--primary-light)',
+                    padding: '12px',
+                    borderRadius: '12px',
+                    marginBottom: '20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    border: '1px solid var(--primary)'
+                }}>
+                    <span style={{ fontSize: '0.85rem', fontWeight: '500' }}>Add to Home Screen?</span>
+                    <button onClick={onInstall} style={{
+                        padding: '6px 12px',
+                        fontSize: '0.8rem',
+                        background: 'var(--primary)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: 'pointer'
+                    }}>Install</button>
+                </div>
+            )}
             <h2 style={{ marginBottom: '24px', fontWeight: '700', background: 'var(--accent-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Welcome Back</h2>
             <form onSubmit={handleSubmit}>
                 <input className="input-glass" type="text" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} required style={{ marginBottom: '16px' }} />
