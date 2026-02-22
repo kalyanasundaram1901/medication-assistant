@@ -10,7 +10,7 @@ import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
 
 // For mobile apps, you should replace 'localhost' with your computer's local IP (e.g., 10.142.143.132)
-const API_BASE_URL = `https://medication-assistant.onrender.com`;
+const API_BASE_URL = 'https://medication-assistant.onrender.com';
 
 function MainApp() {
   const { token, logout } = useAuth();
@@ -54,9 +54,41 @@ function MainApp() {
   const [popupData, setPopupData] = useState(null);
   const [lastNotifiedTime, setLastNotifiedTime] = useState("");
   const [pushStatus, setPushStatus] = useState("Checking...");
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
 
   const chatEndRef = useRef(null);
   const DAYS_OF_WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+  // PWA Install Prompt Listener
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      setDeferredPrompt(e);
+      console.log("PWA install prompt captured");
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+
+    // Show the install prompt
+    deferredPrompt.prompt();
+
+    // Wait for the user to respond to the prompt
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`User response to the install prompt: ${outcome}`);
+
+    // We've used the prompt, and can't use it again, throw it away
+    setDeferredPrompt(null);
+  };
 
   // Create a stable authenticated axios instance
   const api = React.useMemo(() => {
@@ -626,6 +658,24 @@ function MainApp() {
 
 function App() {
   const [isLogin, setIsLogin] = useState(true);
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`User response: ${outcome}`);
+    setDeferredPrompt(null);
+  };
 
   return (
     <AuthProvider>
@@ -633,7 +683,7 @@ function App() {
         <Routes>
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/" element={<AuthCheck isLogin={isLogin} setIsLogin={setIsLogin} />} />
+          <Route path="/" element={<AuthCheck isLogin={isLogin} setIsLogin={setIsLogin} deferredPrompt={deferredPrompt} onInstall={handleInstallClick} />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Router>
@@ -641,14 +691,17 @@ function App() {
   );
 }
 
-function AuthCheck({ isLogin, setIsLogin }) {
+function AuthCheck({ isLogin, setIsLogin, deferredPrompt, onInstall }) {
   const { token } = useAuth();
 
   if (!token) {
     return (
       <div className="auth-wrapper">
         <div className="auth-container">
-          {isLogin ? <Login onToggle={() => setIsLogin(false)} /> : <Signup onToggle={() => setIsLogin(true)} />}
+          {isLogin ?
+            <Login onToggle={() => setIsLogin(false)} deferredPrompt={deferredPrompt} onInstall={onInstall} /> :
+            <Signup onToggle={() => setIsLogin(true)} />
+          }
         </div>
       </div>
     );
