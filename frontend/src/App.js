@@ -54,41 +54,8 @@ function MainApp({ deferredPrompt, onInstall }) {
   const [popupData, setPopupData] = useState(null);
   const [lastNotifiedTime, setLastNotifiedTime] = useState("");
   const [pushStatus, setPushStatus] = useState("Checking...");
-  const [deferredPrompt, setDeferredPrompt] = useState(null);
-
   const chatEndRef = useRef(null);
   const DAYS_OF_WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-  // PWA Install Prompt Listener
-  useEffect(() => {
-    const handleBeforeInstallPrompt = (e) => {
-      // Prevent the mini-infobar from appearing on mobile
-      e.preventDefault();
-      // Stash the event so it can be triggered later.
-      setDeferredPrompt(e);
-      console.log("PWA install prompt captured");
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    };
-  }, []);
-
-  const handleInstallClick = async () => {
-    if (!deferredPrompt) return;
-
-    // Show the install prompt
-    deferredPrompt.prompt();
-
-    // Wait for the user to respond to the prompt
-    const { outcome } = await deferredPrompt.userChoice;
-    console.log(`User response to the install prompt: ${outcome}`);
-
-    // We've used the prompt, and can't use it again, throw it away
-    setDeferredPrompt(null);
-  };
 
   // Create a stable authenticated axios instance
   const api = React.useMemo(() => {
