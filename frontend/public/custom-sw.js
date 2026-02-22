@@ -1,5 +1,78 @@
 /* eslint-disable no-restricted-globals */
 
+const CACHE_NAME = 'med-assist-cache-v1';
+const urlsToCache = [
+    '/',
+    '/index.html',
+    '/manifest.json',
+    '/logo192.png',
+    '/logo512.png',
+    '/favicon.ico'
+];
+
+// Install a service worker
+self.addEventListener('install', event => {
+    // Perform install steps
+    event.waitUntil(
+        caches.open(CACHE_NAME)
+            .then(cache => {
+                console.log('Opened cache');
+                return cache.addAll(urlsToCache);
+            })
+    );
+});
+
+// Cache and return requests
+self.addEventListener('fetch', event => {
+    // Only cache GET requests from our own origin (static assets)
+    if (event.request.method === 'GET' && event.request.url.startsWith(self.location.origin)) {
+        event.respondWith(
+            caches.match(event.request)
+                .then(cachedResponse => {
+                    if (cachedResponse) {
+                        return cachedResponse;
+                    }
+
+                    return fetch(event.request).then(response => {
+                        // Check if we received a valid response
+                        if (!response || response.status !== 200 || response.type !== 'basic') {
+                            return response;
+                        }
+
+                        // Don't cache the service worker itself
+                        if (event.request.url.includes('custom-sw.js')) {
+                            return response;
+                        }
+
+                        const responseToCache = response.clone();
+                        caches.open(CACHE_NAME).then(cache => {
+                            cache.put(event.request, responseToCache);
+                        });
+
+                        return response;
+                    });
+                })
+        );
+    }
+});
+
+
+// Update a service worker
+self.addEventListener('activate', event => {
+    const cacheWhitelist = [CACHE_NAME];
+    event.waitUntil(
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames.map(cacheName => {
+                    if (cacheWhitelist.indexOf(cacheName) === -1) {
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
+        })
+    );
+});
+
 // This event listener wakes up even if the browser is closed (on Android/Windows)
 self.addEventListener('push', function (event) {
     if (event.data) {
@@ -49,3 +122,4 @@ self.addEventListener('notificationclick', function (event) {
         })
     );
 });
+
