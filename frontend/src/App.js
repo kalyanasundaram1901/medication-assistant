@@ -12,7 +12,7 @@ import AdminDashboard from './components/AdminDashboard';
 // For mobile apps, you should replace 'localhost' with your computer's local IP (e.g., 10.142.143.132)
 const API_BASE_URL = 'https://medication-assistant.onrender.com';
 
-function MainApp() {
+function MainApp({ deferredPrompt, onInstall }) {
   const { token, logout } = useAuth();
   const [activeTab, setActiveTab] = useState("chat");
   const [messages, setMessages] = useState([]);
@@ -434,6 +434,7 @@ function MainApp() {
             </div>
           </div>
           <div style={{ display: 'flex', gap: '8px' }}>
+            {deferredPrompt && <button className="toast-btn btn-primary" style={{ height: '32px', padding: '0 12px', fontSize: '11px', background: 'var(--secondary)', boxShadow: 'none' }} onClick={onInstall}>Install App</button>}
             <button className="toast-btn btn-primary" style={{ height: '32px', padding: '0 12px', fontSize: '11px', boxShadow: 'none' }} onClick={setupPushNotifications}>Sync</button>
             <button className="logout-btn" style={{ background: 'rgba(225, 29, 72, 0.1)', color: '#e11d48', border: '1px solid rgba(225, 29, 72, 0.2)', padding: '0 12px', height: '32px', borderRadius: '8px', fontSize: '11px', cursor: 'pointer', fontWeight: '600' }} onClick={logout}>Exit</button>
           </div>
@@ -707,7 +708,7 @@ function AuthCheck({ isLogin, setIsLogin, deferredPrompt, onInstall }) {
     );
   }
 
-  return <MainApp />;
+  return <MainApp deferredPrompt={deferredPrompt} onInstall={onInstall} />;
 }
 
 export default App;
