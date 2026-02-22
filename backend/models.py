@@ -35,6 +35,7 @@ class Schedule(db.Model):
         }
 
 class Confirmation(db.Model):
+    __table_args__ = (db.UniqueConstraint('schedule_id', 'scheduled_time', 'date_str', name='_sch_time_date_uc'),)
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     schedule_id = db.Column(db.Integer, db.ForeignKey('schedule.id'), nullable=False)
