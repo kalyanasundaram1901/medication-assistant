@@ -98,7 +98,19 @@ self.addEventListener('push', function (event) {
             };
 
             const title = data.title || "💊 Medicine Time";
-            event.waitUntil(self.registration.showNotification(title, options));
+            event.waitUntil(
+                Promise.all([
+                    self.registration.showNotification(title, options),
+                    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+                        windowClients.forEach(client => {
+                            client.postMessage({
+                                type: 'PUSH_RECEIVED',
+                                payload: data
+                            });
+                        });
+                    })
+                ])
+            );
         } catch (e) {
             console.error("Push Error:", e);
         }
