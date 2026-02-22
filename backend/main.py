@@ -78,30 +78,38 @@ def reminder_worker():
                         ).first()
                         
                         if not exists:
-                            # Create confirmation record
-                            conf = Confirmation(
-                                user_id=sch.user_id,
-                                schedule_id=sch.id,
-                                medicine_name=sch.medicine_name,
-                                scheduled_time=current_time,
-                                date_str=date_str,
-                                status="sent"
-                            )
-                            db.session.add(conf)
-                            db.session.commit()
-                            
-                            # Send Push Notification
-                            user = User.query.get(sch.user_id)
-                            if user.push_subscription:
-                                sub = json.loads(user.push_subscription)
-                                payload = json.dumps({
-                                    "title": f"💊 Time for {sch.medicine_name}",
-                                    "body": f"It's {sch.time}. Please take your medicine.",
-                                    "id": conf.id,
-                                    "name": sch.medicine_name,
-                                    "time": sch.time
-                                })
-                                send_web_push(sub, payload)
+                            try:
+                                # Create confirmation record
+                                conf = Confirmation(
+                                    user_id=sch.user_id,
+                                    schedule_id=sch.id,
+                                    medicine_name=sch.medicine_name,
+                                    scheduled_time=current_time,
+                                    date_str=date_str,
+                                    status="sent"
+                                )
+                                db.session.add(conf)
+                                db.session.commit()
+                                
+                                # Send Push Notification
+                                user = User.query.get(sch.user_id)
+                                if user and user.push_subscription:
+                                    sub = json.loads(user.push_subscription)
+                                    payload = json.dumps({
+                                        "title": f"💊 Time for {sch.medicine_name}",
+                                        "body": f"It's {sch.time}. Please take your medicine.",
+                                        "id": conf.id,
+                                        "name": sch.medicine_name,
+                                        "time": sch.time
+                                    })
+                                    send_web_push(sub, payload)
+                                    print(f"Sent notification to {user.username} for {sch.medicine_name}")
+                            except Exception as inner_e:
+                                db.session.rollback()
+                                # IntegrityError means someone else already sent it
+                                if "UniqueConstraint" in str(inner_e) or "UNIQUE constraint failed" in str(inner_e):
+                                    continue
+                                print(f"Error creating confirmation: {inner_e}")
                 
                 # Handle Snoozed Reminders
                 snoozed = Confirmation.query.filter_by(status="snoozed", date_str=date_str).all()
