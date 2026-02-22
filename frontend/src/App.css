@@ -13,6 +13,7 @@
   --glass-blur: blur(12px);
   --text-main: #1e293b;
   --text-muted: #64748b;
+  --primary-light: rgba(37, 99, 235, 0.1);
   --accent-gradient: linear-gradient(90deg, #2563eb, #10b981);
   --btn-gradient: linear-gradient(135deg, #3b82f6, #0ea5e9);
 }
@@ -408,6 +409,22 @@ body {
 .auth-container {
   width: 100%;
   max-width: 400px;
+}
+
+.install-banner {
+  animation: fadeInDown 0.5s ease-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Overlays & Popups */
