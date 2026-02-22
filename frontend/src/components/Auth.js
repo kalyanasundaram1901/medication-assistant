@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 // For mobile apps, you should replace 'localhost' with your computer's local IP (e.g., 10.142.143.132)
 const API_BASE_URL = `https://medication-assistant.onrender.com`;
@@ -30,11 +31,12 @@ export const Login = ({ onToggle }) => {
             </form>
             <p onClick={onToggle} style={{ marginTop: '20px', cursor: 'pointer', fontSize: '0.9rem' }}>Don't have an account? <span style={{ color: '#60a5fa', fontWeight: '600' }}>Sign Up</span></p>
             <p style={{ marginTop: '16px', fontSize: '0.8rem', opacity: 0.7 }}>
-                Are you an Admin? <a href="/admin/login" style={{ color: '#60a5fa', textDecoration: 'underline' }}>Login here</a>
+                Are you an Admin? <Link to="/admin/login" style={{ color: '#60a5fa', textDecoration: 'underline' }}>Login here</Link>
             </p>
         </div>
     );
 };
+
 
 export const Signup = ({ onToggle }) => {
     const [username, setUsername] = useState('');
