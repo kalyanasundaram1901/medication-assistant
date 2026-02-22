@@ -97,12 +97,54 @@ function MainApp({ deferredPrompt, onInstall }) {
     }
   };
 
-  // No longer using in-app timer, relying on Push Notifications
+  // 1. In-App Reminder Logic (Visual Toast only, no system notification duplicate)
   useEffect(() => {
-    if (chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+    if (!token || scheduleList.length === 0) return;
+
+    const checkInternalSchedule = () => {
+      const now = new Date();
+      const currentTime = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+      if (currentTime === lastNotifiedTime) return;
+
+      const currentDay = now.toLocaleDateString('en-US', { weekday: 'short' });
+      const medicinesToTake = scheduleList.filter(item => {
+        return item.time === currentTime && item.days?.includes(currentDay);
+      });
+
+      if (medicinesToTake.length > 0) {
+        medicinesToTake.forEach(med => {
+          setPopupData(med);
+          if (!messages.some(m => m.text.includes(med.name) && m.text.includes(currentTime))) {
+            setMessages(prev => [...prev, {
+              sender: "bot",
+              text: `⏰ **REMINDER**: It's time for **${med.name}** (${med.time})! ✅`
+            }]);
+          }
+        });
+        setLastNotifiedTime(currentTime);
+      }
+    };
+
+    const interval = setInterval(checkInternalSchedule, 10000);
+    return () => clearInterval(interval);
+  }, [scheduleList, lastNotifiedTime, token, messages]);
+
+  // 2. Listen for background push events to update UI if app is open
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      const handleMessage = (event) => {
+        if (event.data && event.data.type === 'PUSH_RECEIVED') {
+          console.log("Push received while app open:", event.data.payload);
+          // Only show popup if not already showing from internal timer
+          setPopupData(prev => prev || event.data.payload);
+        }
+      };
+      navigator.serviceWorker.addEventListener('message', handleMessage);
+      return () => navigator.serviceWorker.removeEventListener('message', handleMessage);
     }
-  }, [messages, activeTab]);
+  }, []);
+
+  // 3. Auto-scroll to bottom
 
   function urlBase64ToUint8Array(base64String) {
     const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
