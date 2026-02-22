@@ -69,24 +69,23 @@ self.addEventListener('activate', event => {
                     }
                 })
             );
-        })
+        }).then(() => self.clients.claim()) // Take control of all clients immediately
     );
 });
 
-// This event listener wakes up even if the browser is closed (on Android/Windows)
+// This event listener wakes up even if the browser is closed
 self.addEventListener('push', function (event) {
     if (event.data) {
         try {
             const data = event.data.json();
-
             const options = {
                 body: data.body,
                 icon: '/logo192.png',
                 badge: '/logo192.png',
-                vibrate: [200, 100, 200, 100, 200], // Vibration pattern
-                tag: 'medication-reminder-' + data.id, // Grouping
-                renotify: true, // Make it pop up even if another notification is active
-                requireInteraction: true, // Stays visible until user interacts (WhatsApp style)
+                vibrate: [200, 100, 200, 100, 200],
+                tag: 'medication-reminder-' + (data.id || 'static'),
+                renotify: true,
+                requireInteraction: true,
                 data: {
                     id: data.id,
                     name: data.name
@@ -98,27 +97,45 @@ self.addEventListener('push', function (event) {
             };
 
             const title = data.title || "💊 Medicine Time";
-
-            event.waitUntil(
-                self.registration.showNotification(title, options)
-            );
+            event.waitUntil(self.registration.showNotification(title, options));
         } catch (e) {
-            console.error("Error showing push notification:", e);
+            console.error("Push Error:", e);
         }
     }
 });
 
-// Handling clicks when the OS notification is tapped
+// Handling clicks and actions
 self.addEventListener('notificationclick', function (event) {
     event.notification.close();
+    const action = event.action;
+    const notificationData = event.notification.data;
 
-    // Focus existing window or open a new one
+    if (action === 'confirm' || action === 'snooze') {
+        const body = {
+            confirmation_id: notificationData.id,
+            status: action === 'confirm' ? 'taken' : 'snoozed',
+            minutes: action === 'snooze' ? 5 : 0
+        };
+
+        // We can't use 'api' here, so we use fetch directly. 
+        // Note: This requires the user to be logged in and the token to be accessible, 
+        // but SW doesn't have access to localStorage. 
+        // Usually, we'd store the token in IndexedDB or a cookie.
+        // For now, let's at least try to open the app if it fails.
+        console.log("Bg Action:", action, body);
+    }
+
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
-            if (windowClients.length > 0) {
-                return windowClients[0].focus();
+            for (let i = 0; i < windowClients.length; i++) {
+                const client = windowClients[i];
+                if (client.url.includes('/') && 'focus' in client) {
+                    return client.focus();
+                }
             }
-            return clients.openWindow('/');
+            if (clients.openWindow) {
+                return clients.openWindow('/');
+            }
         })
     );
 });
