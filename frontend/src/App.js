@@ -97,47 +97,7 @@ function MainApp({ deferredPrompt, onInstall }) {
     }
   };
 
-  // In-App Reminder Interval
-  useEffect(() => {
-    if (!token || scheduleList.length === 0) return;
-
-    const checkSchedule = async () => {
-      const now = new Date();
-      const currentTime = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-      if (currentTime === lastNotifiedTime) return;
-
-      const currentDay = now.toLocaleDateString('en-US', { weekday: 'short' });
-
-      const medicinesToTake = scheduleList.filter(item => {
-        if (item.time !== currentTime) return false;
-        if (!item.days?.includes(currentDay)) return false;
-        return true;
-      });
-
-      if (medicinesToTake.length > 0) {
-        medicinesToTake.forEach(med => {
-          setPopupData(med);
-          setMessages(prev => [...prev, {
-            sender: "bot",
-            text: `⏰ **REMINDER**: It's time for **${med.name}** (${med.time})! ✅`
-          }]);
-
-          if (Notification.permission === "granted") {
-            new Notification("Medicine Reminder", {
-              body: `Time to take ${med.name}`,
-              icon: "/logo192.png"
-            });
-          }
-        });
-        setLastNotifiedTime(currentTime);
-      }
-    };
-
-    const interval = setInterval(checkSchedule, 10000);
-    return () => clearInterval(interval);
-  }, [scheduleList, lastNotifiedTime, token]);
-
-  // Auto-scroll to bottom
+  // No longer using in-app timer, relying on Push Notifications
   useEffect(() => {
     if (chatEndRef.current) {
       chatEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -175,11 +135,15 @@ function MainApp({ deferredPrompt, onInstall }) {
 
     try {
       console.log("Attempting Service Worker registration...");
-      const registration = await navigator.serviceWorker.register('/custom-sw.js');
+      // Unregister existing ones first to ensure a clean slate
+      const oldRegs = await navigator.serviceWorker.getRegistrations();
+      for (let r of oldRegs) await r.unregister();
+
+      const registration = await navigator.serviceWorker.register('/custom-sw.js?v=' + Date.now());
       console.log("Service Worker registered:", registration);
 
       await navigator.serviceWorker.ready;
-      console.log("Service Worker is ready.");
+      console.log("Service Worker is ready and active.");
 
       setPushStatus("In Progress...");
       const pubKeyResp = await api.get('/vapid-public-key');
@@ -192,17 +156,21 @@ function MainApp({ deferredPrompt, onInstall }) {
 
       const convertedVapidKey = urlBase64ToUint8Array(publicKey);
 
+      // Unsubscribe existing to avoid "old subscription" issues
+      const existingSub = await registration.pushManager.getSubscription();
+      if (existingSub) await existingSub.unsubscribe();
+
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: convertedVapidKey
       });
 
-      console.log("Subscription object created:", subscription);
+      console.log("New Subscription object created:", subscription);
 
       await api.post('/subscribe', subscription);
-      console.log("Saved to database");
+      console.log("VAPID Subscription saved to database");
       setPushStatus("Active ✅");
-      alert("Success! Notifications are now active.");
+      alert("Perfect! Notifications are now deeply synced to your device. You will receive alerts even when the app is closed.");
     } catch (err) {
       console.error("Critical Push Error:", err);
       setPushStatus("Error ❌");
